@@ -1,1 +1,1 @@
-# go-video
+# video-app

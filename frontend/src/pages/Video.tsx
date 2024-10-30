@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect} from 'react';
 import { MessageSquare, Share2, Heart } from 'lucide-react';
 import ReactPlayer from 'react-player';
 import axios from 'axios';
@@ -12,6 +12,7 @@ type Comment = {
   	username: string;
   	video_id: string;
 };
+
 
 export default function Video({ videoID }: { videoID: string }) {
   	const [metadata, setMetadata] = useState<any>(null);
@@ -33,8 +34,8 @@ export default function Video({ videoID }: { videoID: string }) {
             	setComments(commentResponse.data);
 
         	} catch(error) {
-            	console.error("error fetching the video", error);
-            	setError('Failed to load comments');
+            		console.error("error fetching the video", error);
+            		setError('Failed to load comments');
         	}
     	}
     	fetchVideo();
@@ -153,7 +154,7 @@ export default function Video({ videoID }: { videoID: string }) {
 			)}
          
           </div>
-          
+	  {error && <div className="error-message">{error}</div>} 
         </div>
       </div>
     </div>

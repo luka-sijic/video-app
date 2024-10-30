@@ -2,8 +2,8 @@
 
 import { useState, useEffect} from 'react';
 import { MapPin, Calendar, File, HardDrive } from "lucide-react";
-import { jwtDecode } from "jwt-decode";
 import axios from 'axios';
+import { jwtDecode } from "jwt-decode";
 const apiUrl = import.meta.env.VITE_API_URL;
 const authUrl = import.meta.env.VITE_AUTH_URL;
 
@@ -32,12 +32,16 @@ type StorageData = {
   total: number;
 };
 
+interface DecodedToken {
+	username: string;
+}
+
 export default function Profile({ userID }: { userID: string }) {
     const [user, setUser] = useState<UserType | null>(null);
     const [storage, setStorage] = useState<StorageData | null>(null);
     const [remaining, setRemaining] = useState<number | null>(null);
     const [activity, setActivity] = useState<ActivityData[]>([]);
-
+    const [username, setUsername] = useState<string | null>(null);
     const baseAvatarURL = import.meta.env.VITE_STATIC_URL + "/avatars/";
     const baseIconURL = import.meta.env.VITE_STATIC_URL + "/icons/";
     const token = localStorage.getItem('token');
@@ -46,6 +50,11 @@ export default function Profile({ userID }: { userID: string }) {
     useEffect(() => {
         const fetchData = async () => {
             try {
+		if (token) {
+			const decodedToken = jwtDecode<DecodedToken>(token);
+			setUsername(decodedToken.username);
+			console.log(decodedToken.username);
+		}
                 const response = await axios.get(authUrl + `/users/${userID}`, {
                   headers: {
                     Authorization: `Bearer ${token}`, 
@@ -53,12 +62,12 @@ export default function Profile({ userID }: { userID: string }) {
                 });
                 setUser(response.data);
 
-                const response3 = await axios.get(apiUrl + `/storage/${userID}`);
+                const response3 = await axios.get(apiUrl + `/storage/${username}`);
                 setStorage(response3.data);
                 const res = response3.data as StorageData;
                 setRemaining(10 - res.total);
 
-                const response2 = await axios.get<ActivityData[]>(apiUrl + `/activity/${userID}`, {
+                const response2 = await axios.get<ActivityData[]>(apiUrl + `/activity/${username}`, {
                     headers: {
                         Authorization: `Bearer ${token}`, 
                     }

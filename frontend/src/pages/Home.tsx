@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchVideoMetaData } from '../api/api'; 
 import { Play, Heart, MessageSquare } from 'lucide-react';
-import React from 'react';
 
 
 type Metadata = {

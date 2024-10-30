@@ -2,7 +2,7 @@ import React from 'react'
 import { BrowserRouter as Router, Route, Routes, useParams, Navigate, Outlet } from 'react-router-dom';
 import Users from './pages/Users';
 import Home from './pages/Home';
-import DMPage from './pages/DMPage';
+//import DMPage from './pages/DMPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import UploadVideoPage from './pages/Upload';
@@ -41,7 +41,6 @@ function App() {
             <Route path="/users" element={<Users />} />
             <Route path="/home" element={<Home />} />
             <Route path="/settings" element={<Settings />} />
-            <Route path="/dm" element={<DMPage />} />
             <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Route>

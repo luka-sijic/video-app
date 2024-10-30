@@ -21,7 +21,7 @@ type Activity struct {
 }
 
 func getProfile(c echo.Context) error {
-    username := c.Get("username").(string)
+    username := c.Param("id")
 	
     var user models.User
     err := database.DB.QueryRow(context.Background(), "SELECT id, username, credits, role, status, country, rating, avatar, TO_CHAR(creationDate, 'MM-DD-YY') AS formatted_date FROM users WHERE username=$1", username).
@@ -93,9 +93,8 @@ func IdToUser(userid int) string {
 }*/
 
 func getActivity(c echo.Context) error {
-	username := c.Get("username").(string)
+	username := c.Param("id")
 	var activities []Activity
-
 
 	query := "SELECT id, action, username, TO_CHAR(action_time, 'MM-DD-YY') AS formatted_date FROM activity WHERE username=$1"
 	rows, err := database.DB.Query(context.Background(), query, username)
@@ -103,20 +102,28 @@ func getActivity(c echo.Context) error {
 		fmt.Println("ACTIVITIES NOT FOUND")
 	}
 	defer rows.Close()
-
 	for rows.Next() {
-		var a1 Activity
-		err := rows.Scan(&a1.ID, &a1.Action, &a1.Username, &a1.Actiontime)
+		var activity Activity
+		err := rows.Scan(&activity.ID, &activity.Action, &activity.Username, &activity.Actiontime)
 		if err != nil {
 			fmt.Printf("Error scanning activity data: %v", err)
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error scanning activity data"})
 		}
-		activities = append(activities, a1)
+		activities = append(activities, activity)
 	}
 
 	if err = rows.Err(); err != nil {
+		fmt.Println("Error 45")
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error processing activity data"})
 	}
+
+	if (activities == nil) {
+                var activity Activity
+                activity.ID = 1
+                activity.Action = "No recent activity found"
+                activity.Username = username
+                activities = append(activities, activity)
+        }
 
 	return c.JSON(http.StatusOK, activities)
 }
@@ -229,7 +236,7 @@ func getStorage(c echo.Context) error {
 }*/
 
 func getStorage(c echo.Context) error {
-	username := c.Get("username").(string)
+	username := c.Param("id")
 	var vSizes []vSize
 
 	query := "SELECT size FROM videos WHERE username=$1"

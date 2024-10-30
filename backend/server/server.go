@@ -82,22 +82,23 @@ func Start() {
 	e.POST("/video/:id/comment", sendComment, JWTMiddleware)
 	e.POST("/video/:id/like", likeVideo)
 	e.GET("/home", getHomePage, JWTMiddleware)
-	e.GET("/activity/:id", getActivity, JWTMiddleware)
+	e.GET("/activity/:id", getActivity)
 	//e.GET("/activity", getSelfActivity, JWTMiddleware)
 
 	e.Static("/thumbnails", "./uploads/thumbnails")
 	e.Static("/avatars", "./uploads/avatars")
 	e.Static("/icons", "./uploads/icons")
 
-	//e.GET("/profile/:id", getUser)
-	e.GET("/profile", getProfile, JWTMiddleware)
+	e.GET("/profile/:id", getProfile)
 	e.POST("/country", changeCountry, JWTMiddleware)
 	e.POST("/uploadpfp", uploadPfp, JWTMiddleware)
-	e.GET("/storage/:id", getStorage)
+	e.GET("/storage/:id", getStorage, JWTMiddleware)
 	//e.GET("/storage", getSelfStorage, JWTMiddleware)
-
+	e.GET("/", root)
 	
-	e.Logger.Fatal(e.Start(":8083"))
+	e.Logger.Fatal(e.Start(":8086"))
 }
 
-
+func root(c echo.Context) error {
+	return c.JSON(http.StatusOK, "api")
+}

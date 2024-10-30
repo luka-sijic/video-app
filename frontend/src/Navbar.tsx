@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";
 
-
+interface DecodedToken {
+	username: string;
+}
 
 
 
@@ -12,8 +14,10 @@ const Navbar: React.FC = () => {
   	useEffect(() => {
     	const token = localStorage.getItem('token');
     	try {
-      		const decodedToken = jwtDecode(token);
-      		setUsername(decodedToken.username);
+		if (token) {
+      			const decodedToken = jwtDecode<DecodedToken>(token);
+      			setUsername(decodedToken.username);
+		}
     	} catch (error) {
       		console.error("Invalid token", error);
     	}

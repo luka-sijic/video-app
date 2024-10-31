@@ -3,6 +3,7 @@
 import { useState, useEffect} from 'react';
 import { MessageSquare, Share2, Heart } from 'lucide-react';
 import ReactPlayer from 'react-player';
+import { HelmetProvider } from 'react-helmet-async';
 import axios from 'axios';
 import React from 'react';
 
@@ -70,6 +71,21 @@ export default function Video({ videoID }: { videoID: string }) {
   }
 
   return (
+    <>
+    {metadata && (
+        <HelmetProvider>
+          <title>{metadata.name}</title>
+          <meta property="og:type" content="video.other" />
+          <meta property="og:url" content={`https://api.basedgroup.com/video/${metadata.id}`} />
+          <meta property="og:title" content={metadata.name} />
+          <meta property="og:description" content={"Watch this amazing video!"} />
+          <meta property="og:image" content={`https://api.basedgroup.com/video/${metadata.thumbnail}`} />
+          <meta property="og:video" content={`https://api.basedgroup.com/video/${metadata.title}`} />
+          <meta property="og:video:width" content="640" />
+          <meta property="og:video:height" content="360" />
+          <meta property="og:video:type" content="video/mp4" />
+        </HelmetProvider>
+      )}
     <div className="min-h-screen bg-black text-white">
       <div className="max-w-4xl mx-auto p-4">
         {/* Video Player */}
@@ -158,5 +174,6 @@ export default function Video({ videoID }: { videoID: string }) {
         </div>
       </div>
     </div>
-  )
-}
+    </>
+  );
+};

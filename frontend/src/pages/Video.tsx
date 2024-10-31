@@ -78,8 +78,9 @@ export default function Video({ videoID }: { videoID: string }) {
           <meta property="og:type" content="video.other" />
           <meta property="og:url" content={`https://api.basedgroup.com/video/${metadata.id}`} />
           <meta property="og:title" content={metadata.name} />
-          <meta property="og:description" content={"Watch this amazing video!"} />
-          <meta property="og:image" content={`https://api.basedgroup.com/${metadata.thumbnail}`} />
+          <meta name="description" content="video" />
+          <meta property="og:description" content="video" />
+          <meta property="og:image" content={`https://api.basedgroup.com/thumbnails/${metadata.thumbnail}`} />
           <meta property="og:video" content={`https://api.basedgroup.com/video/${metadata.id}`} />
           <meta property="og:video:secure_url" content="`https://api.basedgroup.com/video/${metadata.id}`" />
           <meta property="og:video:width" content="640" />

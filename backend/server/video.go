@@ -112,7 +112,7 @@ func getVideoMetadata(c echo.Context) error {
 	videoID := c.Param("id")
 
 	var metadata models.VideoMetadata
-	err := database.DB.QueryRow(context.Background(), "SELECT v.id, v.title, v.thumbnail, v.duration, COUNT(l.id) AS likes, v.views FROM videos v LEFT JOIN likes l ON v.id = l.video_id GROUP BY v.id, v.title, v.thumbnail, v.duration, v.views ORDER BY $1", videoID).
+	err := database.DB.QueryRow(context.Background(), "SELECT v.id, v.title, v.thumbnail, v.duration, COUNT(l.id) AS likes, v.views FROM videos v LEFT JOIN likes l ON v.id = l.video_id WHERE v.id = $1 GROUP BY v.id, v.title, v.thumbnail, v.duration, v.views", videoID).
 		Scan(&metadata.ID, &metadata.Title, &metadata.Thumbnail, &metadata.Duration, &metadata.Likes, &metadata.Views)
 	if err != nil {
 		fmt.Println(err)

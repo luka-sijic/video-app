@@ -4,7 +4,7 @@ import { useState, useEffect} from 'react';
 import { MapPin, Calendar, File, HardDrive } from "lucide-react";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { fetchVideoMetaData } from '../api/api'; 
+//import { fetchVideoMetaData } from '../api/api'; 
 import { jwtDecode } from "jwt-decode";
 import { Play, Heart, MessageSquare } from 'lucide-react';
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -23,12 +23,12 @@ type UserType = {
     creationdate: string;
 };
 
-type ActivityData = {
+/*type ActivityData = {
     id: number;
     action: string;
     username: string;
     actiontime: string;
-};
+};*/
 
 type StorageData = {
   amt: number;
@@ -52,7 +52,7 @@ export default function Profile({ userID }: { userID: string }) {
     const [user, setUser] = useState<UserType | null>(null);
     const [storage, setStorage] = useState<StorageData | null>(null);
     const [remaining, setRemaining] = useState<number | null>(null);
-    const [activity, setActivity] = useState<ActivityData[]>([]);
+//    const [activity, setActivity] = useState<ActivityData[]>([]);
 	const [metadata, setMetadata] = useState<Metadata[]>([]);
     const [username, setUsername] = useState<string | null>(null);
     const baseAvatarURL = import.meta.env.VITE_STATIC_URL + "/avatars/";

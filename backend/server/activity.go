@@ -53,45 +53,6 @@ func IdToUser(userid int) string {
 	return username
 }
 
-/* getActivity(c echo.Context) error {
-	userID := c.Param("id")
-	var activities []Activity
-	val, _ := strconv.Atoi(userID)
-
-	username := IdToUser(val)
-
-	query := "SELECT id, action, username, TO_CHAR(action_time, 'MM-DD-YY') AS formatted_date FROM activity WHERE username=$1"
-	rows, err := database.DB.Query(context.Background(), query, username)
-	if err != nil {
-		fmt.Println("ACTIVITIES NOT FOUND")
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var a1 Activity
-		err := rows.Scan(&a1.ID, &a1.Action, &a1.Username, &a1.Actiontime)
-		if err != nil {
-			fmt.Printf("Error scanning activity data: %v", err)
-			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error scanning activity data"})
-		}
-		activities = append(activities, a1)
-	}
-
-	if err = rows.Err(); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error processing activity data"})
-	}
-
-	if (activities == nil) {
-		var a1 Activity 
-		a1.ID = val	
-		a1.Action = "No recent activity found"
-		a1.Username = username 
-		activities = append(activities, a1)
-	}
-
-	return c.JSON(http.StatusOK, activities)
-}*/
-
 func getActivity(c echo.Context) error {
 	username := c.Param("id")
 	var activities []Activity
@@ -118,12 +79,12 @@ func getActivity(c echo.Context) error {
 	}
 
 	if (activities == nil) {
-                var activity Activity
-                activity.ID = 1
-                activity.Action = "No recent activity found"
-                activity.Username = username
-                activities = append(activities, activity)
-        }
+        var activity Activity
+        activity.ID = 1
+        activity.Action = "No recent activity found"
+        activity.Username = username
+        activities = append(activities, activity)
+    }
 
 	return c.JSON(http.StatusOK, activities)
 }
@@ -195,48 +156,10 @@ type vSize struct {
 	Amt int `json:"amt"`
 	Total float64 `json:"total"`
 }
-/*
-func getStorage(c echo.Context) error {
-	userID := c.Param("id")
-	val2, _ := strconv.Atoi(userID)
-
-	username := IdToUser(val2)
-	var vSizes []vSize
-
-	query := "SELECT size FROM videos WHERE username=$1"
-	rows, err := database.DB.Query(context.Background(), query, username)
-	if err != nil {
-		fmt.Println("Error getting video sizes")
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var v vSize
-		err := rows.Scan(&v.Size)
-		if err != nil {
-			fmt.Println("Error scanning vsizes")
-		}
-		vSizes = append(vSizes, v)
-	}
-	if err = rows.Err(); err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error processing video size data"})
-	}
-	var val int64 
-	for i,_ := range vSizes {
-		fmt.Println(vSizes[i])
-		val += vSizes[i].Size
-	}
-	var v vSize
-	var f float64 = float64(val)
-	x := f / 1000000000
-	f = math.Floor(x*100) / 100
-	v.Total = f
-	v.Amt = len(vSizes)
-
-	return c.JSON(http.StatusOK, v)
-}*/
 
 func getStorage(c echo.Context) error {
 	username := c.Param("id")
+	fmt.Println(username)
 	var vSizes []vSize
 
 	query := "SELECT size FROM videos WHERE username=$1"
@@ -270,6 +193,7 @@ func getStorage(c echo.Context) error {
 	x := f / 1000000000
 	f = math.Floor(x*100) / 100
 	v.Total = f
+	v.Amt = len(vSizes)
 
 	return c.JSON(http.StatusOK, v)
 }

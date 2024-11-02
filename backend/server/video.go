@@ -167,12 +167,12 @@ func getComments(c echo.Context) error {
 }
 
 func getHomePage(c echo.Context) error {
-	username := c.Get("username").(string)
+	//username := c.Get("username").(string)
+	username := c.Param("id")
 	var videos []models.VideoMetadata
 
 	rows, err := database.DB.Query(context.Background(), "SELECT v.id, v.title, v.thumbnail, v.duration, COUNT(l.id) AS likes, v.views FROM videos v LEFT JOIN likes l ON v.id = l.video_id WHERE v.username = $1 GROUP BY v.id, v.title, v.thumbnail, v.duration, v.views ORDER BY v.id", username)
 	if err != nil {
-		fmt.Println("YEP")
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to retrieve videos"})
 	}
 	defer rows.Close()

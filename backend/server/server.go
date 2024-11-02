@@ -81,14 +81,14 @@ func Start() {
 	e.GET("/video/:id/comment", getComments)
 	e.POST("/video/:id/comment", sendComment, JWTMiddleware)
 	e.POST("/video/:id/like", likeVideo)
-	e.GET("/home", getHomePage, JWTMiddleware)
+	e.GET("/home/:id", getHomePage)
 
 	e.Static("/thumbnails", "./uploads/thumbnails")
 	e.Static("/avatars", "./uploads/avatars")
 	e.Static("/icons", "./uploads/icons")
 
 	e.GET("/profile/:id", getProfile)
-	e.GET("/storage/:id", getStorage, JWTMiddleware)
+	e.GET("/storage/:id", getStorage)
 	e.GET("/activity/:id", getActivity)
 	e.POST("/country", changeCountry, JWTMiddleware)
 	e.POST("/uploadpfp", uploadPfp, JWTMiddleware)

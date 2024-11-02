@@ -26,20 +26,31 @@ export default function Home() {
     		try {
         		const response = await fetchVideoMetaData();
         		setMetadata(response);
-        		setFilteredVideos(response);
+				if (response && response.length > 0) {
+					setFilteredVideos(response);
+				} else {
+					console.log("Videos are not available");
+					setFilteredVideos([]);
+				}	
       		} catch(error) {
         		console.error("error");
+				return [];
       		}
     	}
     	fetchVideo()
   	}, [])
 
   	useEffect(() => {
-    	const filtered = metadata.filter(video =>
-      		video.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    	setFilteredVideos(filtered);
-  	}, [searchQuery, metadata]);
+		if (!metadata) {
+		  setFilteredVideos([]);
+		  return;
+		}
+	  
+		const filtered = metadata.filter(video =>
+		  video.title.toLowerCase().includes(searchQuery.toLowerCase())
+		);
+		setFilteredVideos(filtered);
+	}, [searchQuery, metadata]);
 
 
   
@@ -62,7 +73,8 @@ export default function Home() {
       <main className="max-w-7xl mx-auto p-4">
         <h2 className="text-xl font-semibold mb-6">Your Videos</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredVideos.map((video) => (
+		{filteredVideos && filteredVideos.length > 0 ? (
+          filteredVideos.map((video) => (
             <div
               key={video.id}
               className="relative group cursor-pointer"
@@ -98,7 +110,12 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          ))}
+		  ))
+          ) : (
+			<div className="container mx-auto">
+				<p className="text-center mb-50">No videos uploaded yet</p>
+			</div>
+		)}
         </div>
       </main>
     </div>

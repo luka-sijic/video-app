@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-const apiUrl = import.meta.env.VITE_AUTH_URL;
+const apiUrl = import.meta.env.VITE_API_URL;
 
 export default function Settings() {
     const [country, setCountry] = useState<string>("");

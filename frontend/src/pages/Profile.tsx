@@ -4,7 +4,6 @@ import { useState, useEffect} from 'react';
 import { MapPin, Calendar, File, HardDrive } from "lucide-react";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-//import { fetchVideoMetaData } from '../api/api'; 
 import { jwtDecode } from "jwt-decode";
 import { Play, Heart, MessageSquare } from 'lucide-react';
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -22,13 +21,6 @@ type UserType = {
     avatar: string;
     creationdate: string;
 };
-
-/*type ActivityData = {
-    id: number;
-    action: string;
-    username: string;
-    actiontime: string;
-};*/
 
 type StorageData = {
   amt: number;
@@ -52,15 +44,14 @@ export default function Profile({ userID }: { userID: string }) {
     const [user, setUser] = useState<UserType | null>(null);
     const [storage, setStorage] = useState<StorageData | null>(null);
     const [remaining, setRemaining] = useState<number | null>(null);
-//    const [activity, setActivity] = useState<ActivityData[]>([]);
-	const [metadata, setMetadata] = useState<Metadata[]>([]);
+	  const [metadata, setMetadata] = useState<Metadata[]>([]);
     const [username, setUsername] = useState<string | null>(null);
     const baseAvatarURL = import.meta.env.VITE_STATIC_URL + "/avatars/";
     const baseIconURL = import.meta.env.VITE_STATIC_URL + "/icons/";
     const token = localStorage.getItem('token');
 
-	const thumbnailBaseURL = import.meta.env.VITE_STATIC_URL + "/thumbnails/";
-	const navigate = useNavigate();
+	  const thumbnailBaseURL = import.meta.env.VITE_STATIC_URL + "/thumbnails/";
+	  const navigate = useNavigate();
 
     useEffect(() => {
         if (token) {
@@ -111,24 +102,31 @@ export default function Profile({ userID }: { userID: string }) {
             }
         };
         getInfo();
-    }, [username, token]);
+    }, [username, token, userID]);
 
     // Fetch video metadata
     useEffect(() => {
         const fetchVideo = async () => {
             try {
-                const r1 = await axios.get<Metadata[]>(apiUrl + `/home/${userID}`, {
+                const r1 = await axios.get<Metadata[]>(
+                  apiUrl + `/home/${userID}`, 
+                  {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
-                });
+                  }
+                );
                 setMetadata(r1.data);
             } catch (error) {
-                console.error("Error fetching video metadata");
+              if (axios.isCancel(error)) {
+                console.log('Request canceled:', error.message);
+              } else {
+                console.error('Error fetching videos:', error);
+              }
             }
         };
         fetchVideo();
-    }, []);
+    }, [userID]);
 
 
     return (

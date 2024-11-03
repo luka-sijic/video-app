@@ -4,6 +4,9 @@ import { useState, useEffect} from 'react';
 import { MessageSquare, Share2, Heart } from 'lucide-react';
 import ReactPlayer from 'react-player';
 import { HelmetProvider } from 'react-helmet-async';
+import { jwtDecode } from "jwt-decode";
+const apiUrl = import.meta.env.VITE_API_URL;
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import React from 'react';
 
@@ -14,6 +17,9 @@ type Comment = {
   	video_id: string;
 };
 
+interface DecodedToken {
+	username: string;
+}
 
 export default function Video({ videoID }: { videoID: string }) {
   	const [metadata, setMetadata] = useState<any>(null);
@@ -24,6 +30,8 @@ export default function Video({ videoID }: { videoID: string }) {
 
   	const videoSrc = import.meta.env.VITE_API_URL + `/video/${videoID}`;
   	const token = localStorage.getItem('token');
+	const navigate = useNavigate();
+
 
   	useEffect(() => {
     	const fetchVideo = async () => {
@@ -42,19 +50,33 @@ export default function Video({ videoID }: { videoID: string }) {
     	fetchVideo();
   	}, [videoID])
   
-  const handlePostComment = async () => {
-    if (newComment.trim() === "") return;
-
-    try {
-        await axios.post(`/comments/${videoID}`, {
-            username: "user", 
-            text: newComment,
-        });
-        setNewComment(""); 
-    } catch (error) {
-        console.error("Error posting comment:", error);
-    }
-};
+	const handlePostComment = async () => {
+    	if (newComment.trim() === "") return;
+		
+    	try {
+			if(token) {
+				const decodedToken = jwtDecode<DecodedToken>(token);
+				await axios.post(
+					apiUrl + `/video/${videoID}/comment`, 
+					{
+						username: decodedToken.username, 
+						text: newComment,
+					},
+					{
+						headers: {
+                        	Authorization: `Bearer ${token}`,
+                    	},
+					}
+				);
+				setNewComment(""); 
+			} else {
+				console.log("No token found, redirecting to login...");
+				navigate('/login'); // Redirect to login page
+			}
+    	} catch (error) {
+        	console.error("Error posting comment:", error);
+    	}
+	};
 
 
   const handleLikeSubmit = async (e: React.FormEvent) => {
@@ -151,10 +173,11 @@ export default function Video({ videoID }: { videoID: string }) {
                 Post
               </button>
             </div>
-          <div className="space-y-4">
+			<br />
+          <div className="space-y-5">
           {comments && comments.length > 0 ? (
   			comments.map((comment) => (
-    		<div key={comment.id} className="bg-gray-800 rounded-lg p-4">
+    		<div key={comment.id} className="bg-gray-800 rounded-lg p-5">
       			<div className="flex items-center justify-between mb-2">
         			<span className="font-semibold">{comment.username || 'Anonymous'}</span>
         		<button className="text-gray-400 hover:text-white transition">

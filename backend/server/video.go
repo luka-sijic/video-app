@@ -121,21 +121,30 @@ func getVideoMetadata(c echo.Context) error {
 	return c.JSON(http.StatusOK, metadata)
 }
 
+type CommentRequest struct {
+    Text string `json:"text"`
+}
 
 func sendComment(c echo.Context) error {
 	videoID := c.Param("id")
 	username := c.Get("username").(string)
-	content := c.FormValue("content")
 
+	var req CommentRequest
+    if err := c.Bind(&req); err != nil {
+        return c.JSON(http.StatusBadRequest, echo.Map{"error": "Invalid request body"})
+    }
 
+    content := req.Text
+	fmt.Println("Content: ", content)
 	if content == "" {
 		return c.JSON(http.StatusBadRequest, echo.Map{"error": "Comment can't be empty"})
 	}
-
+	
 	_, err := database.DB.Exec(context.Background(), "INSERT INTO comments (content, username, video_id) VALUES ($1,$2,$3)", content, username, videoID )
 	if err != nil {
         return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Error adding comment"})
     }
+
 	return c.JSON(http.StatusOK, echo.Map{"message": "Comment added successfully"})
 }
 

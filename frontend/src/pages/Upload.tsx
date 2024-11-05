@@ -12,7 +12,7 @@ const UploadVideoPage: React.FC = () => {
   const [uploadProgress, setUploadProgress] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const chunkSize = 5 * 1024 * 1024 // 5MB per chunk
+  const chunkSize = 5 * 1024 * 1024 * 17 // 70MB per chunk
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0]

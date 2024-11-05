@@ -1,23 +1,31 @@
-import React from 'react';
-import ReactPlayer from 'react-player';
+import React, { useEffect, useRef } from 'react';
+import Hls from 'hls.js';
 
 const HLSPlayer: React.FC<{ streamUrl: string }> = ({ streamUrl }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (Hls.isSupported() && videoRef.current) {
+      const hls = new Hls();
+      hls.loadSource(streamUrl);
+      hls.attachMedia(videoRef.current);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        videoRef.current?.play();
+      });
+
+      return () => {
+        hls.destroy();
+      };
+    } else if (videoRef.current?.canPlayType('application/vnd.apple.mpegurl')) {
+      videoRef.current.src = streamUrl;
+    }
+  }, [streamUrl]);
+
   return (
-    <ReactPlayer
-      url={streamUrl}
+    <video
+      ref={videoRef}
       controls
-      playing
-      width="100%"
-      height="100%"
-      className="react-player" // Add custom styling if needed
-      config={{
-        file: {
-          attributes: {
-            controlsList: 'nodownload' // Add native video attributes if needed
-          },
-          forceHLS: true, // Ensures HLS.js is used for .m3u8 files
-        },
-      }}
+      className="w-full h-full object-cover" // Ensures the video fits within the container
     />
   );
 };

@@ -40,22 +40,24 @@ func proccessVideo(filename, username, filePath string, fileSize int64) {
 }
 
 func createHLSStream(filePath, title string) {
-    outputPath := filepath.Join("streams", title)
-    os.MkdirAll(outputPath, 0755)
-    // FFmpeg command to create HLS stream
-	cmd := exec.Command(
-		"ffmpeg",
-		"-i", filePath,
-		"-profile:v", "baseline",
-		"-level", "3.0",
-		"-start_number", "0",
-		"-hls_time", "10",
-		"-hls_list_size", "0",
-		"-f", "hls",
-		filepath.Join(outputPath, "playlist.m3u8"),
-	)
+	go func() {
+		outputPath := filepath.Join("streams", title)
+    	os.MkdirAll(outputPath, 0755)
+    	// FFmpeg command to create HLS stream
+		cmd := exec.Command(
+			"ffmpeg",
+			"-i", filePath,
+			"-profile:v", "baseline",
+			"-level", "3.0",
+			"-start_number", "0",
+			"-hls_time", "10",
+			"-hls_list_size", "0",
+			"-f", "hls",
+			filepath.Join(outputPath, "playlist.m3u8"),
+		)
 
-    cmd.Run()
+    	cmd.Run()
+	}() 
 }
 
 // Function to parse FFmpeg output and extract duration

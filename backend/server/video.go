@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"context"
 	"time"
-	"log"
-	"strconv"
+	//"log"
+	//"strconv"
 	"github.com/labstack/echo/v4"
 	"strings"
 
@@ -30,9 +30,10 @@ func uploadVideo(c echo.Context) error {
 	title := c.FormValue("title")
 	chunkIndex := c.FormValue("chunkIndex")
 	totalChunks := c.FormValue("totalChunks")
-	filesize := c.FormValue("fileSize")
+	//filesize := c.FormValue("fileSize")
 	filename := c.FormValue("fileName")
-
+	
+	/*
 	fsize, err := strconv.Atoi(filesize)
 	if err != nil {
 		log.Println(err)
@@ -41,7 +42,7 @@ func uploadVideo(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{
 			"message": "File is too large. Must be below 100MB",
 		})
-	}
+	}*/
 	
 	if !strings.HasSuffix(filename, ".mp4") {
 		return c.JSON(http.StatusBadRequest, echo.Map{

@@ -65,7 +65,7 @@ func Start() {
 		AllowOrigins: []string{"*"}, 
 		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization}, 
-    	AllowCredentials: true,
+    	AllowCredentials: false,
 	}))
 
 	

@@ -116,7 +116,7 @@ export default function Video({ videoID }: { videoID: string }) {
         {/* Video Player */}
         <div className="relative aspect-video w-full h-full max-w-full bg-black rounded-lg overflow-hidden">
           {metadata ? (
-            <HLSPlayer streamUrl={`http://localhost:8086/streams/${metadata.title}/playlist.m3u8`} />
+            <HLSPlayer streamUrl={`https://api.basedgroup.com/streams/${metadata.title}/playlist.m3u8`} />
           ) : (
             <p>Video is not available.</p>
           )}

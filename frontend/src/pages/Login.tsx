@@ -17,7 +17,7 @@ export default function Login() {
         	if (response.status === 200) {
         		const { token } = response.data;
         		localStorage.setItem('token', token);
-        		navigate('/home');
+        		navigate('/');
         	}
       	} catch (err) {
     		setError('Login failed. Please check your username and password.');

@@ -5,7 +5,7 @@ import { Play, Heart, MessageSquare } from 'lucide-react';
 
 
 type Metadata = {
-  	id: number;
+  id: number;
 	title: string;
 	thumbnail: string;
 	duration: string;

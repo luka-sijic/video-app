@@ -93,8 +93,9 @@ func uploadVideo(c echo.Context) error {
 			DateUploaded: time.Now(),
 		}
 		videoDB[videoID] = videoMetadata
-
+		
 		proccessVideo(title, username, filePath, fileSize)
+		createHLSStream(filePath, title)
 
 		return c.JSON(http.StatusOK, echo.Map{
 			"message": "File uploaded successfully",

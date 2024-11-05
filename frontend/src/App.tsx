@@ -39,7 +39,7 @@ function App() {
             <Route element={<Layout />}>
             <Route path="/upload" element={<UploadVideoPage />} />
             <Route path="/users" element={<Users />} />
-            <Route path="/home" element={<Home />} />
+            <Route path="/" element={<Home />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<NotFoundPage />} />
             </Route>

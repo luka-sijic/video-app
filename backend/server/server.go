@@ -86,6 +86,7 @@ func Start() {
 	e.Static("/thumbnails", "./uploads/thumbnails")
 	e.Static("/avatars", "./uploads/avatars")
 	e.Static("/icons", "./uploads/icons")
+	e.Static("/streams", "./streams")
 
 	e.GET("/profile/:id", getProfile)
 	e.GET("/storage/:id", getStorage)

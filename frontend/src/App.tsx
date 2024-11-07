@@ -8,7 +8,7 @@ import Register from './pages/Register';
 import UploadVideoPage from './pages/Upload';
 import Video from './pages/Video';
 import Layout from './Layout';
-import Admin from './pages/Admin';
+//import Admin from './pages/Admin';
 import NotFoundPage from './pages/NotFound';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
@@ -19,7 +19,7 @@ const PrivateRoute : React.FC = () => {
 	const isAuth = localStorage.getItem('token') !== null;
   	return isAuth ? <Outlet /> : <Navigate to="/login" />;
 }
-
+//           <Route path="/admin" element={<Admin />} />
 
 function App() {
   return (
@@ -33,7 +33,7 @@ function App() {
             <Route path="/profile/:userID" element={<ProfileWrapper />} />
           </Route>
           
-          <Route path="/admin" element={<Admin />} />
+
 
           <Route element={<PrivateRoute />}>
             <Route element={<Layout />}>

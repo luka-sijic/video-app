@@ -1,4 +1,4 @@
-'use client'
+/*'use client'
 
 import * as React from 'react'
 import { BarChart3, FileX, LayoutDashboard, Settings, ShieldAlert, Users } from 'lucide-react'
@@ -266,4 +266,4 @@ function AnalyticsSection() {
       </CardContent>
     </Card>
   )
-}
+}*/

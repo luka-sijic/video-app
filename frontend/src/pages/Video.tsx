@@ -29,7 +29,7 @@ export default function Video({ videoID }: { videoID: string }) {
     const [ws, setWs] = useState<WebSocket | null>(null);
 
 
-  	const videoSrc = import.meta.env.VITE_API_URL + `/video/${videoID}`;
+  	//const videoSrc = import.meta.env.VITE_API_URL + `/video/${videoID}`;
   	const token = localStorage.getItem('token');
 	  const navigate = useNavigate();
 

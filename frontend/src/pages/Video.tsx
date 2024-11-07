@@ -29,7 +29,7 @@ export default function Video({ videoID }: { videoID: string }) {
     const [ws, setWs] = useState<WebSocket | null>(null);
 
 
-  	//const videoSrc = import.meta.env.VITE_API_URL + `/video/${videoID}`;
+  	const videoSrc = import.meta.env.VITE_API_URL;
   	const token = localStorage.getItem('token');
 	  const navigate = useNavigate();
 
@@ -114,13 +114,13 @@ export default function Video({ videoID }: { videoID: string }) {
         <HelmetProvider>
           <title>{metadata.name}</title>
           <meta property="og:type" content="video.other" />
-          <meta property="og:url" content={`https://api.basedgroup.com/video/${metadata.id}`} />
+          <meta property="og:url" content={videoSrc + `/video/${metadata.id}`} />
           <meta property="og:title" content={metadata.name} />
           <meta name="description" content="video" />
           <meta property="og:description" content="video" />
-          <meta property="og:image" content={`https://api.basedgroup.com/thumbnails/${metadata.thumbnail}`} />
-          <meta property="og:video" content={`https://api.basedgroup.com/video/${metadata.id}`} />
-          <meta property="og:video:secure_url" content="`https://api.basedgroup.com/video/${metadata.id}`" />
+          <meta property="og:image" content={videoSrc + `/thumbnails/${metadata.thumbnail}`} />
+          <meta property="og:video" content={videoSrc + `/video/${metadata.id}`} />
+          <meta property="og:video:secure_url" content={videoSrc + `/video/${metadata.id}`} />
           <meta property="og:video:width" content="640" />
           <meta property="og:video:height" content="360" />
           <meta property="og:video:type" content="video/mp4" />
@@ -131,7 +131,7 @@ export default function Video({ videoID }: { videoID: string }) {
         {/* Video Player */}
         <div className="relative aspect-video w-full h-full max-w-full bg-black rounded-lg overflow-hidden">
           {metadata ? (
-            <HLSPlayer streamUrl={`http://localhost:8086/streams/${metadata.title}/playlist.m3u8`} />
+            <HLSPlayer streamUrl={videoSrc + `/streams/${metadata.title}/playlist.m3u8`} />
           ) : (
             <p>Video is not available.</p>
           )}

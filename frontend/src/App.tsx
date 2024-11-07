@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react'
-import { BrowserRouter as Router, Route, Routes, useParams, Navigate, Outlet, useNavigate } from 'react-router-dom';
+import React from 'react'
+import { BrowserRouter as Router, Route, Routes, useParams, Navigate, Outlet } from 'react-router-dom';
 import Users from './pages/Users';
 import Home from './pages/Home';
 //import DMPage from './pages/DMPage';
@@ -14,37 +14,15 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import './App.css';
 import './index.css';
-import { jwtDecode } from "jwt-decode";
 
 const PrivateRoute : React.FC = () => {
 	const isAuth = localStorage.getItem('token') !== null;
   	return isAuth ? <Outlet /> : <Navigate to="/login" />;
 }
 
-function isTokenExpired(token: string) {
-  if (!token) return true;
 
-  try {
-    const decoded = jwtDecode(token);
-    // If 'exp' is missing, consider the token invalid
-    if (!decoded.exp) return true;
-    
-    return Date.now() >= decoded.exp * 1000;
-  } catch (error) {
-    // If the token is malformed or cannot be decoded, consider it expired
-    return true;
-  }
-}
 
 function App() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token || isTokenExpired(token)) {
-      navigate('/login');
-    }
-  }, [navigate]);
   return (
       <Router>
         <Routes>

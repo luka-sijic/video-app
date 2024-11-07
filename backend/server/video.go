@@ -32,6 +32,7 @@ func uploadVideo(c echo.Context) error {
 	totalChunks := c.FormValue("totalChunks")
 	//filesize := c.FormValue("fileSize")
 	filename := c.FormValue("fileName")
+	visibility := c.FormValue("visibility")
 	
 	/*
 	fsize, err := strconv.Atoi(filesize)
@@ -94,8 +95,8 @@ func uploadVideo(c echo.Context) error {
 			DateUploaded: time.Now(),
 		}
 		videoDB[videoID] = videoMetadata
-		
-		proccessVideo(title, username, filePath, fileSize)
+
+		proccessVideo(title, username, filePath, visibility, fileSize)
 		createHLSStream(filePath, title)
 
 		return c.JSON(http.StatusOK, echo.Map{
@@ -178,15 +179,23 @@ func getComments(c echo.Context) error {
 }
 
 func getHomePage(c echo.Context) error {
-	//username := c.Get("username").(string)
+	user := c.Get("username").(string)
 	username := c.Param("id")
 	var videos []models.VideoMetadata
 
-	rows, err := database.DB.Query(context.Background(), "SELECT v.id, v.title, v.thumbnail, v.duration, COUNT(l.id) AS likes, v.views FROM videos v LEFT JOIN likes l ON v.id = l.video_id WHERE v.username = $1 GROUP BY v.id, v.title, v.thumbnail, v.duration, v.views ORDER BY v.id", username)
+	var query string
+	if user == username {
+		query = "SELECT v.id, v.title, v.thumbnail, v.duration, COUNT(l.id) AS likes, v.views FROM videos v LEFT JOIN likes l ON v.id = l.video_id WHERE v.username = $1 GROUP BY v.id, v.title, v.thumbnail, v.duration, v.views ORDER BY v.id"
+	} else {
+		query = "SELECT v.id, v.title, v.thumbnail, v.duration, COUNT(l.id) AS likes, v.views FROM videos v LEFT JOIN likes l ON v.id = l.video_id WHERE v.username = $1 AND v.visibility = false GROUP BY v.id, v.title, v.thumbnail, v.duration, v.views ORDER BY v.id"
+	}
+	
+	rows, err := database.DB.Query(context.Background(), query, username)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to retrieve videos"})
 	}
 	defer rows.Close()
+	
 
 	for rows.Next() {
 		var video models.VideoMetadata
@@ -237,4 +246,16 @@ func likeVideo(c echo.Context) error {
         return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Error adding like"})
     }
 	return c.JSON(http.StatusOK, echo.Map{"message": "Like added successfully"})
+}
+
+func deleteVideo(c echo.Context) error {
+	id := c.Param("id")
+	fmt.Println(id)
+
+	_, err := database.DB.Exec(context.Background(), "DELETE FROM videos WHERE id=$1", id)
+	if err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Error deleting videos"})
+	}
+	return c.JSON(http.StatusOK, echo.Map{"message": "Video deleted successfully"})
 }

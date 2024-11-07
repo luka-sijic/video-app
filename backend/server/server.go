@@ -81,7 +81,9 @@ func Start() {
 	e.GET("/video/:id/comment", getComments)
 	e.POST("/video/:id/comment", sendComment, JWTMiddleware)
 	e.POST("/video/:id/like", likeVideo)
-	e.GET("/home/:id", getHomePage)
+	e.GET("/home/:id", getHomePage, JWTMiddleware)
+	e.GET("/video/:id/delete", deleteVideo)
+	e.GET("/ws/comments", handleWebSocket)
 
 	e.Static("/thumbnails", "./uploads/thumbnails")
 	e.Static("/avatars", "./uploads/avatars")

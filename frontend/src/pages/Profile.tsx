@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { MapPin, Calendar, File, HardDrive } from "lucide-react";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -65,21 +65,28 @@ export default function Profile({ userID }: { userID: string }) {
 
     // Fetch user data once username is available
     useEffect(() => {
-        const fetchData = async () => {
-            if (!username) return; // Wait until username is set
-            try {
-                const response = await axios.get(authUrl + `/users/${userID}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-                setUser(response.data);
-            } catch (error) {
-                console.log("Error fetching user data");
-            }
-        };
-        fetchData();
-    }, [username, userID, token]);
+      const fetchData = async () => {
+          try {
+              if (!username) return;
+  
+              const [userRes, storageRes, videoRes] = await Promise.all([
+                  axios.get(authUrl + `/users/${userID}`, { headers: { Authorization: `Bearer ${token}` } }),
+                  axios.get(apiUrl + `/storage/${userID}`, { headers: { Authorization: `Bearer ${token}` } }),
+                  axios.get(apiUrl + `/home/${userID}`, { headers: { Authorization: `Bearer ${token}` } })
+              ]);
+  
+              setUser(userRes.data);
+              const storageData = storageRes.data as StorageData;
+              setStorage(storageData);
+              setRemaining(10 - storageData.total);
+              setMetadata(videoRes.data);
+          } catch (error) {
+              console.log("Error fetching data:", error);
+          }
+      };
+  
+      fetchData();
+  }, [username, token, userID]);
 
     // Fetch storage and activity data once username is available
     useEffect(() => {

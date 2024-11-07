@@ -52,13 +52,13 @@ const Users: React.FC = () => {
             </caption>
             <thead>
               <tr className="border-b border-gray-800">
-                <th className="w-[200px] text-center py-3 px-4 text-gray-400 font-medium">Username</th>
-                <th className="w-[200px] text-center py-3 px-4 text-gray-400 font-medium">Credits</th>
-                <th className="text-center py-3 px-4 text-gray-400 font-medium">Role</th>
-                <th className="text-center py-3 px-4 text-gray-400 font-medium">Rating</th>
-                <th className="text-center py-3 px-4 text-gray-400 font-medium">Country</th>
-                <th className="text-center py-3 px-4 text-gray-400 font-medium">Status</th>
-                <th className="text-center py-3 px-4 text-gray-400 font-medium">Date created</th>
+                <th className="w-[200px] text-left py-3 px-4 text-gray-400 font-medium">Username</th>
+                <th className="w-[200px] text-left py-3 px-4 text-gray-400 font-medium">Credits</th>
+                <th className="text-left py-3 px-4 text-gray-400 font-medium">Role</th>
+                <th className="text-left py-3 px-4 text-gray-400 font-medium">Rating</th>
+                <th className="text-left py-3 px-4 text-gray-400 font-medium">Country</th>
+                <th className="text-left py-3 px-4 text-gray-400 font-medium">Status</th>
+                <th className="text-left py-3 px-4 text-gray-400 font-medium">Date created</th>
               </tr>
             </thead>
             <tbody>

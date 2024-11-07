@@ -25,6 +25,8 @@ const HLSPlayer: React.FC<{ streamUrl: string }> = ({ streamUrl }) => {
     <video
       ref={videoRef}
       controls
+      width="100%"
+      height="100%"
       className="w-full h-full object-cover" // Ensures the video fits within the container
     />
   );

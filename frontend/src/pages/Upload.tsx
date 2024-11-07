@@ -5,14 +5,15 @@ import axios from 'axios';
 import { Upload, CheckCircle, AlertCircle } from 'lucide-react';
 
 const UploadVideoPage: React.FC = () => {
-  const [file, setFile] = useState<File | null>(null)
-  const [title, setTitle] = useState<string>('')
-  const [uploadStatus, setUploadStatus] = useState<string>('')
-  const [isDragging, setIsDragging] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [file, setFile] = useState<File | null>(null);
+  const [title, setTitle] = useState<string>('');
+  const [visibility, setVisibility] = useState<string>('');
+  const [uploadStatus, setUploadStatus] = useState<string>('');
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const chunkSize = 5 * 1024 * 1024 * 17 // 70MB per chunk
+  const chunkSize = 5 * 1024 * 1024 // 70MB per chunk
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0]
@@ -32,12 +33,14 @@ const UploadVideoPage: React.FC = () => {
     for (let start = 0; start < file.size; start += chunkSize) {
       const chunk = file.slice(start, start + chunkSize)
       const formData = new FormData()
-      formData.append('video', chunk)
+      formData.append('video', chunk);
       formData.append('chunkIndex', (chunkIndex + 1).toString())
       formData.append('totalChunks', totalChunks.toString())
       formData.append('fileName', file.name);
       formData.append('fileSize', file.size.toString());
-      formData.append('title', title)
+      formData.append('title', title);
+      console.log("Visibility:", visibility);
+      formData.append('visibility', visibility);
 
       try {
         const token = localStorage.getItem('token')
@@ -93,6 +96,11 @@ const UploadVideoPage: React.FC = () => {
     }
   }
 
+  const handleVisibilityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log("Selected visibility:", e.target.value); // Log the selected value
+    setVisibility(e.target.value);
+  };
+
   return (
     <div className="min-h-5 bg-black text-white flex items-center justify-center p-4">
       <div className="upload-container w-full max-w-md">
@@ -147,6 +155,17 @@ const UploadVideoPage: React.FC = () => {
             Select File
           </button>
         </div>
+        <br />
+          <select
+            id="visibility"
+            value={visibility}
+            onChange={handleVisibilityChange}
+            className="w-full p-2 bg-gray-800 border border-gray-600 rounded-md text-white"
+          >
+            <option value="">Select Visibility</option>
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
         <div className="mt-6 flex justify-center">
           <button
             onClick={uploadFile}

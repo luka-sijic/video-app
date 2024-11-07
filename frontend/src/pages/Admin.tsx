@@ -1,4 +1,3 @@
-/*
 'use client'
 
 import * as React from 'react'
@@ -267,4 +266,4 @@ function AnalyticsSection() {
       </CardContent>
     </Card>
   )
-}*/
+}

@@ -2,7 +2,6 @@
 
 import { useState, useEffect} from 'react';
 import { MessageSquare, Share2, Heart } from 'lucide-react';
-import ReactPlayer from 'react-player';
 import { HelmetProvider } from 'react-helmet-async';
 import { jwtDecode } from "jwt-decode";
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -27,6 +26,7 @@ export default function Video({ videoID }: { videoID: string }) {
   	const [comments, setComments] = useState<Comment[]>([]);
   	const [newComment, setNewComment] = useState<string>("");
   	const [error, setError] = useState<string | null>(null);
+    const [ws, setWs] = useState<WebSocket | null>(null);
 
 
   	const videoSrc = import.meta.env.VITE_API_URL + `/video/${videoID}`;
@@ -35,6 +35,15 @@ export default function Video({ videoID }: { videoID: string }) {
 
 
   	useEffect(() => {
+      const wsConnection = new WebSocket(apiUrl.replace(/^http/, 'ws') + '/ws/comments');
+      setWs(wsConnection);
+      wsConnection.onmessage = (event) => {
+        const comment = JSON.parse(event.data);
+        setComments((prevComments) => [...prevComments, comment]);
+      };
+      wsConnection.onopen = () => console.log("Connected to WebSocket");
+      wsConnection.onclose = () => console.log("Disconnected from WebSocket");
+
     	const fetchVideo = async () => {
         	try {
             	const metadataResponse = await axios.get(import.meta.env.VITE_API_URL + `/video/${videoID}/metadata`);
@@ -52,28 +61,34 @@ export default function Video({ videoID }: { videoID: string }) {
   	}, [videoID])
   
 	const handlePostComment = async () => {
-    	if (newComment.trim() === "") return;
+    	if (newComment.trim() === "" || !ws) return;
 		
     	try {
-			if(token) {
-				const decodedToken = jwtDecode<DecodedToken>(token);
-				await axios.post(
-					apiUrl + `/video/${videoID}/comment`, 
-					{
-						username: decodedToken.username, 
-						text: newComment,
-					},
-					{
-						headers: {
-              Authorization: `Bearer ${token}`,
-            },
-					}
-				);
-				setNewComment(""); 
-			} else {
-				console.log("No token found, redirecting to login...");
-				navigate('/login'); // Redirect to login page
-			}
+			  if(token) {
+				  const decodedToken = jwtDecode<DecodedToken>(token);
+				  await axios.post(
+					  apiUrl + `/video/${videoID}/comment`, 
+					  {
+						  username: decodedToken.username, 
+						  text: newComment,
+					  },
+					  {
+						  headers: {
+                Authorization: `Bearer ${token}`,
+              },
+					  }
+				  );
+          const commentData = {
+            content: newComment,
+            username: decodedToken.username, 
+            video_id: videoID
+          }
+          ws.send(JSON.stringify(commentData));
+				  setNewComment(""); 
+			  } else {
+				  console.log("No token found, redirecting to login...");
+				  navigate('/login'); // Redirect to login page
+			  }
     	} catch (error) {
         	console.error("Error posting comment:", error);
     	}
@@ -116,7 +131,7 @@ export default function Video({ videoID }: { videoID: string }) {
         {/* Video Player */}
         <div className="relative aspect-video w-full h-full max-w-full bg-black rounded-lg overflow-hidden">
           {metadata ? (
-            <HLSPlayer streamUrl={`https://api.basedgroup.com/streams/${metadata.title}/playlist.m3u8`} />
+            <HLSPlayer streamUrl={`http://localhost:8086/streams/${metadata.title}/playlist.m3u8`} />
           ) : (
             <p>Video is not available.</p>
           )}

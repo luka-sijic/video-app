@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 )
 
-func proccessVideo(filename, username, filePath string, fileSize int64) {
+func proccessVideo(filename, username, filePath, visibility string, fileSize int64) {
 	go func() {
 		thumbnailPath := filepath.Join("./uploads/thumbnails/" + filename + ".jpg")
 		if err := generateThumbnail(filePath, thumbnailPath); err != nil {
@@ -26,7 +26,14 @@ func proccessVideo(filename, username, filePath string, fileSize int64) {
 			fmt.Println(err.Error())
 		}
 
-		_, err = database.DB.Exec(context.Background(), "INSERT INTO videos (title, size, username, thumbnail, duration) VALUES ($1,$2,$3,$4,$5)", filename, fileSize, username, thumbnailURL, duration)
+		val := false
+		if visibility == "public" {
+			val = false
+		} else if visibility == "private" {
+			val = true
+		}
+
+		_, err = database.DB.Exec(context.Background(), "INSERT INTO videos (title, size, username, thumbnail, duration, visibility) VALUES ($1,$2,$3,$4,$5,$6)", filename, fileSize, username, thumbnailURL, duration, val)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
@@ -52,6 +59,7 @@ func createHLSStream(filePath, title string) {
 			"-start_number", "0",
 			"-hls_time", "10",
 			"-hls_list_size", "0",
+			"-preset", "fast",
 			"-f", "hls",
 			filepath.Join(outputPath, "playlist.m3u8"),
 		)

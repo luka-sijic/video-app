@@ -65,7 +65,7 @@ export default function Home() {
 
   const handleDelete = async (videoID: number) => {
     try {
-      const response = await axios.get(`http://localhost:8086/video/${videoID}/delete`)
+      const response = await axios.get(import.meta.env.VITE_API_URL + `/video/${videoID}/delete`)
       
       console.log(response)
       

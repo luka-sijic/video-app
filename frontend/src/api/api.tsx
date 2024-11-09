@@ -10,6 +10,7 @@ type Metadata = {
     duration: string;
     likes: number;
     views: number;
+    comments: number;
 };
 
 interface DecodedToken {

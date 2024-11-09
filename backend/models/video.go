@@ -20,6 +20,7 @@ type VideoMetadata struct {
 	Duration string `json:"duration"`
 	Likes int `json:"likes"`
 	Views int `json:"views"`
+	Comments int `json:"comments"`
 }
 
 

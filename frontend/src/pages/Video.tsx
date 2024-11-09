@@ -8,7 +8,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import React from 'react';
-import HLSPlayer from './HLSPlayer';
+import 'hls-video-element';
 
 type Comment = {
   	id: number;
@@ -26,7 +26,7 @@ export default function Video({ videoID }: { videoID: string }) {
   	const [comments, setComments] = useState<Comment[]>([]);
   	const [newComment, setNewComment] = useState<string>("");
   	const [error, setError] = useState<string | null>(null);
-    const [ws, setWs] = useState<WebSocket | null>(null);
+    const [isLiked, setIsLiked] = useState(false);
 
 
   	const videoSrc = import.meta.env.VITE_API_URL;
@@ -35,22 +35,27 @@ export default function Video({ videoID }: { videoID: string }) {
 
 
   	useEffect(() => {
-      const wsConnection = new WebSocket(apiUrl.replace(/^http/, 'ws') + '/ws/comments');
-      setWs(wsConnection);
-      wsConnection.onmessage = (event) => {
-        const comment = JSON.parse(event.data);
-        setComments((prevComments) => [...prevComments, comment]);
-      };
-      wsConnection.onopen = () => console.log("Connected to WebSocket");
-      wsConnection.onclose = () => console.log("Disconnected from WebSocket");
 
     	const fetchVideo = async () => {
         	try {
             	const metadataResponse = await axios.get(import.meta.env.VITE_API_URL + `/video/${videoID}/metadata`);
             	setMetadata(metadataResponse.data);
 
+              await axios.post(import.meta.env.VITE_API_URL + `/video/${videoID}/view`);
+
             	const commentResponse = await axios.get<Comment[]>(import.meta.env.VITE_API_URL + `/video/${videoID}/comment`);
             	setComments(commentResponse.data);
+              if (commentResponse.data == null) {
+                setMetadata((prevMetadata: any) => ({
+                  ...prevMetadata,
+                  comments: 0
+                }));
+              } else {
+                setMetadata((prevMetadata: any) => ({
+                  ...prevMetadata,
+                  comments: commentResponse.data.length
+                }));
+              }
 
         	} catch(error) {
             		console.error("error fetching the video", error);
@@ -61,7 +66,7 @@ export default function Video({ videoID }: { videoID: string }) {
   	}, [videoID])
   
 	const handlePostComment = async () => {
-    	if (newComment.trim() === "" || !ws) return;
+    	if (newComment.trim() === "") return;
 		
     	try {
 			  if(token) {
@@ -78,13 +83,18 @@ export default function Video({ videoID }: { videoID: string }) {
               },
 					  }
 				  );
-          const commentData = {
-            content: newComment,
-            username: decodedToken.username, 
-            video_id: videoID
-          }
-          ws.send(JSON.stringify(commentData));
-				  setNewComment(""); 
+          const resp = await axios.get(import.meta.env.VITE_API_URL + `/video/${videoID}/comment`, {
+            headers: {
+              Authorization: `Bearer ${token}`, 
+            },
+          })
+          setComments(resp.data);
+          setMetadata((prevMetadata: any) => ({
+            ...prevMetadata,
+            comments: resp.data.length
+          }));
+          console.log(resp.data.length);
+          setNewComment('');
 			  } else {
 				  console.log("No token found, redirecting to login...");
 				  navigate('/login'); // Redirect to login page
@@ -97,12 +107,33 @@ export default function Video({ videoID }: { videoID: string }) {
 
   const handleLikeSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
     try {
-      await axios.post(import.meta.env.VITE_API_URL + `/video/${videoID}/like`, {}, {
+      if (isLiked == true) {
+        await axios.post(import.meta.env.VITE_API_URL + `/video/${videoID}/unlike`, {}, {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        })
+      } else {
+        await axios.post(import.meta.env.VITE_API_URL + `/video/${videoID}/like`, {}, {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        })
+      }
+
+      setIsLiked(!isLiked);
+
+      const resp = await axios.get(import.meta.env.VITE_API_URL + `/video/${videoID}/likes`, {
         headers: {
           Authorization: `Bearer ${token}`, 
         },
       })
+      setMetadata((prevMetadata: any) => ({
+        ...prevMetadata,
+        likes: resp.data
+      }));
     } catch (error) {
       console.error('Error liking video:', error)
     }
@@ -131,7 +162,16 @@ export default function Video({ videoID }: { videoID: string }) {
         {/* Video Player */}
         <div className="relative aspect-video w-full h-full max-w-full bg-black rounded-lg overflow-hidden">
           {metadata ? (
-            <HLSPlayer streamUrl={videoSrc + `/streams/${metadata.title}/playlist.m3u8`} />
+            <hls-video
+              src={videoSrc + `/streams/${metadata.title}/playlist.m3u8`}
+              controls 
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'fill',
+              }}
+            ></hls-video>   
+           // <HLSPlayer streamUrl={videoSrc + `/streams/${metadata.title}/playlist.m3u8`} />
           ) : (
             <p>Video is not available.</p>
           )}
@@ -146,13 +186,17 @@ export default function Video({ videoID }: { videoID: string }) {
             <div className="flex items-center space-x-4">
               <form onSubmit={handleLikeSubmit}>
                 <button className="flex items-center space-x-1 hover:text-white transition">
-                  <Heart className="w-5 h-5" />
+                  <Heart 
+                    className="w-5 h-5"
+                    color={isLiked ? "red" : "currentColor"}
+                    fill={isLiked ? "red" : "none"}
+                  />
                   <span>{metadata.likes}</span>
                 </button>
               </form>
               <button className="flex items-center space-x-1 hover:text-white transition">
                 <MessageSquare className="w-5 h-5" />
-                <span>456</span>
+                <span>{metadata.comments}</span>
               </button>
               <button className="flex items-center space-x-1 hover:text-white transition">
                 <Share2 className="w-5 h-5" />

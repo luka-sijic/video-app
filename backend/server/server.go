@@ -78,12 +78,19 @@ func Start() {
 	e.POST("/upload", uploadVideo, JWTMiddleware)
 	e.GET("/video/:id", getVideo)
 	e.GET("/video/:id/metadata", getVideoMetadata)
+	// Comment Endpoints
 	e.GET("/video/:id/comment", getComments)
 	e.POST("/video/:id/comment", sendComment, JWTMiddleware)
+	e.GET("/ws/comments", handleWebSocket)
+	// Like Endpoints
 	e.POST("/video/:id/like", likeVideo)
+	e.POST("/video/:id/unlike", unlikeVideo)
+	e.GET("/video/:id/likes", getLikes)
+	// View Endpoints
+	e.POST("/video/:id/view", viewVideo)
+	e.GET("/video/:id/views", getViews)
 	e.GET("/home/:id", getHomePage, JWTMiddleware)
 	e.GET("/video/:id/delete", deleteVideo)
-	e.GET("/ws/comments", handleWebSocket)
 
 	e.Static("/thumbnails", "./uploads/thumbnails")
 	e.Static("/avatars", "./uploads/avatars")

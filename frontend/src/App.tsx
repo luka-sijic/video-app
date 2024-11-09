@@ -15,10 +15,27 @@ import Settings from './pages/Settings';
 import './App.css';
 import './index.css';
 
-const PrivateRoute : React.FC = () => {
-	const isAuth = localStorage.getItem('token') !== null;
-  	return isAuth ? <Outlet /> : <Navigate to="/login" />;
-}
+const isTokenExpired = (token: string): boolean => {
+  try {
+    // Decode the token payload
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const exp = payload.exp;
+    
+    // Check if token is expired
+    console.log("Expired: ", exp * 1000 < Date.now());
+    return exp * 1000 < Date.now();
+  } catch (error) {
+    console.error('Failed to parse token', error);
+    return true; // Treat as expired if there's an error
+  }
+};
+
+const PrivateRoute: React.FC = () => {
+  const token = localStorage.getItem('token');
+  const isAuth = token !== null && !isTokenExpired(token);
+
+  return isAuth ? <Outlet /> : <Navigate to="/login" />;
+};
 
 
 

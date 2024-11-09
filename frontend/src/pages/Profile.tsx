@@ -34,6 +34,7 @@ type Metadata = {
 	duration: string;
 	likes: number;
 	views: number;
+  comments: number;
 };
 
 interface DecodedToken {
@@ -233,7 +234,7 @@ export default function Profile({ userID }: { userID: string }) {
                   </div>
                   <div className="flex items-center">
                     <MessageSquare className="w-3 h-3 mr-1" />
-                    Comments
+                    {video.comments}
                   </div>
                 </div>
               </div>

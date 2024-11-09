@@ -12,6 +12,7 @@ import (
 	//"strconv"
 	"github.com/labstack/echo/v4"
 	"strings"
+	"reflect"
 
 	"app/database"
 	"app/models"
@@ -115,12 +116,26 @@ func getVideoMetadata(c echo.Context) error {
 	videoID := c.Param("id")
 
 	var metadata models.VideoMetadata
-	err := database.DB.QueryRow(context.Background(), "SELECT v.id, v.title, v.thumbnail, v.duration, COUNT(l.id) AS likes, v.views FROM videos v LEFT JOIN likes l ON v.id = l.video_id WHERE v.id = $1 GROUP BY v.id, v.title, v.thumbnail, v.duration, v.views", videoID).
-		Scan(&metadata.ID, &metadata.Title, &metadata.Thumbnail, &metadata.Duration, &metadata.Likes, &metadata.Views)
+	err := database.DB.QueryRow(context.Background(), "SELECT v.id, v.title, v.thumbnail, v.duration, COUNT(c.id) AS comment_count FROM videos v LEFT JOIN comments c ON v.id = c.video_id WHERE v.id = $1 GROUP BY v.id, v.title, v.thumbnail, v.duration;", videoID).
+		Scan(&metadata.ID, &metadata.Title, &metadata.Thumbnail, &metadata.Duration, &metadata.Comments)
 	if err != nil {
 		fmt.Println(err)
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Video not found"})
 	}
+	key := fmt.Sprintf("video:%s:likes", videoID)
+	likes, err := database.RDB.Get(context.Background(), key).Int()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	metadata.Likes = likes
+
+	key = fmt.Sprintf("video:%s:views", videoID)
+	views, err := database.RDB.Get(context.Background(), key).Int()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	metadata.Views = views
+
 	return c.JSON(http.StatusOK, metadata)
 }
 
@@ -185,9 +200,9 @@ func getHomePage(c echo.Context) error {
 
 	var query string
 	if user == username {
-		query = "SELECT v.id, v.title, v.thumbnail, v.duration, COUNT(l.id) AS likes, v.views FROM videos v LEFT JOIN likes l ON v.id = l.video_id WHERE v.username = $1 GROUP BY v.id, v.title, v.thumbnail, v.duration, v.views ORDER BY v.id"
+		query = "SELECT v.id, v.title, v.thumbnail, v.duration, COUNT(c.id) AS comment_count FROM videos v LEFT JOIN comments c ON v.id = c.video_id WHERE v.username = $1 GROUP BY v.id, v.title, v.thumbnail, v.duration"
 	} else {
-		query = "SELECT v.id, v.title, v.thumbnail, v.duration, COUNT(l.id) AS likes, v.views FROM videos v LEFT JOIN likes l ON v.id = l.video_id WHERE v.username = $1 AND v.visibility = false GROUP BY v.id, v.title, v.thumbnail, v.duration, v.views ORDER BY v.id"
+		query = "SELECT v.id, v.title, v.thumbnail, v.duration, COUNT(c.id) AS comment_count FROM videos v LEFT JOIN comments c ON v.id = c.video_id WHERE v.username = $1 AND visibility = false GROUP BY v.id, v.title, v.thumbnail, v.duration"
 	}
 	
 	rows, err := database.DB.Query(context.Background(), query, username)
@@ -195,15 +210,29 @@ func getHomePage(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to retrieve videos"})
 	}
 	defer rows.Close()
-	
 
 	for rows.Next() {
 		var video models.VideoMetadata
-		err := rows.Scan(&video.ID, &video.Title, &video.Thumbnail, &video.Duration, &video.Likes, &video.Views)
+		err := rows.Scan(&video.ID, &video.Title, &video.Thumbnail, &video.Duration, &video.Comments)
 		if err != nil {
 			fmt.Printf("Error scanning meta data: %v", err)
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error scanning video data"})
 		}
+		fmt.Println(video.ID)
+		key := fmt.Sprintf("video:%d:likes", video.ID)
+		likes, err := database.RDB.Get(context.Background(), key).Int()
+		if err != nil {
+			fmt.Println(reflect.TypeOf(video.ID))
+			return c.JSON(http.StatusInternalServerError, err)
+		}
+		video.Likes = likes
+
+		key = fmt.Sprintf("video:%d:views", video.ID)
+		views, err := database.RDB.Get(context.Background(), key).Int()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err)
+		}
+		video.Views = views
 		videos = append(videos, video)
 	}
 
@@ -236,21 +265,61 @@ func getVideo(c echo.Context) error {
 }
 
 func likeVideo(c echo.Context) error {
-	username := "based"
+	//username := "based"
 	videoID := c.Param("id")
-	fmt.Println(videoID)
+	
+	key := fmt.Sprintf("video:%s:likes", videoID)
+	database.RDB.Incr(context.Background(), key).Err()
 
-	_, err := database.DB.Exec(context.Background(), "INSERT INTO likes (username, video_id) VALUES ($1,$2)", username, videoID)
-	if err != nil {
-		fmt.Println(err)
-        return c.JSON(http.StatusInternalServerError, echo.Map{"error": "Error adding like"})
-    }
+	
 	return c.JSON(http.StatusOK, echo.Map{"message": "Like added successfully"})
+}
+
+func unlikeVideo(c echo.Context) error {
+	//username := "based"
+	videoID := c.Param("id")
+	
+	key := fmt.Sprintf("video:%s:likes", videoID)
+	database.RDB.Decr(context.Background(), key).Err()
+
+	
+	return c.JSON(http.StatusOK, echo.Map{"message": "Like added successfully"})
+}
+
+func getLikes(c echo.Context) error {
+	videoID := c.Param("id")
+
+	key := fmt.Sprintf("video:%s:likes", videoID)
+	likes, err := database.RDB.Get(context.Background(), key).Int()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, likes)
+}
+
+func viewVideo(c echo.Context) error {
+	videoID := c.Param("id")
+	
+	key := fmt.Sprintf("video:%s:views", videoID)
+	database.RDB.Incr(context.Background(), key).Err()
+
+	
+	return c.JSON(http.StatusOK, echo.Map{"message": "Video viewed successfully"})
+}
+
+func getViews(c echo.Context) error {
+	videoID := c.Param("id")
+
+	key := fmt.Sprintf("video:%s:views", videoID)
+	views, err := database.RDB.Get(context.Background(), key).Int()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+	return c.JSON(http.StatusOK, views)
 }
 
 func deleteVideo(c echo.Context) error {
 	id := c.Param("id")
-	fmt.Println(id)
 
 	_, err := database.DB.Exec(context.Background(), "DELETE FROM videos WHERE id=$1", id)
 	if err != nil {

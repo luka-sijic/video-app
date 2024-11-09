@@ -22,6 +22,7 @@ type Metadata = {
 	duration: string;
 	likes: number;
 	views: number;
+  comments: number;
 };
 
 export default function Home() {
@@ -35,18 +36,18 @@ export default function Home() {
   	useEffect(() => {
 		const fetchVideo = async () => {
     		try {
-        		const response = await fetchVideoMetaData();
-        		setMetadata(response);
-				if (response && response.length > 0) {
-					setFilteredVideos(response);
-				} else {
-					console.log("Videos are not available");
-					setFilteredVideos([]);
-				}	
-      		} catch(error) {
-        		console.error("error");
-				return [];
-      		}
+        	const response = await fetchVideoMetaData();
+        	setMetadata(response);
+				  if (response && response.length > 0) {
+					  setFilteredVideos(response);
+				  } else {
+					  console.log("Videos are not available");
+					  setFilteredVideos([]);
+				  }	
+      	} catch(error) {
+        	console.error("error");
+				  return [];
+      	}
     	}
     	fetchVideo()
   	}, [])
@@ -135,7 +136,7 @@ export default function Home() {
                       </div>
                       <div className="flex items-center">
                         <MessageSquare className="w-3 h-3 mr-1" />
-                        Comments
+                        {video.comments}
                       </div>
                     </div>
                   </div>

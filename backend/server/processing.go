@@ -37,12 +37,30 @@ func proccessVideo(filename, username, filePath, visibility string, fileSize int
 		if err != nil {
 			fmt.Println(err.Error())
 		}
-        
-        query := "INSERT INTO activity (action, username) VALUES ($1,$2)"
-        _, err = database.DB.Exec(context.Background(), query, "File uploaded: " + filename, username)
+		var videoID int
+		database.DB.QueryRow(context.Background(), "SELECT id FROM videos WHERE title=$1", filename).Scan(&videoID)
 		if err != nil {
 			fmt.Println(err.Error())
 		}
+		fmt.Println("VIDEOID:", videoID)
+		key := fmt.Sprintf("video:%d:likes", videoID)
+    	err = database.RDB.Set(context.Background(), key, 0, 0).Err() // Set initial likes to 0
+    	if err != nil {
+        	fmt.Println(err.Error())
+    	}
+		key = fmt.Sprintf("video:%d:views", videoID)
+    	err = database.RDB.Set(context.Background(), key, 0, 0).Err() // Set initial likes to 0
+    	if err != nil {
+        	fmt.Println(err.Error())
+    	}
+    	fmt.Println("Video like count initialized to 0")
+
+        
+        /*query := "INSERT INTO activity (action, username) VALUES ($1,$2)"
+        _, err = database.DB.Exec(context.Background(), query, "File uploaded: " + filename, username)
+		if err != nil {
+			fmt.Println(err.Error())
+		}*/
 	}()
 }
 
@@ -117,3 +135,13 @@ func generateThumbnail(videoPath string, thumbnailPath string) error {
     }
     return nil
 }
+
+/*func initializeVideo(videoID string) error {
+    key := fmt.Sprintf("video:%s:likes", videoID)
+    err := database.RDB.Set(context.Background(), key, 0, 0).Err() // Set initial likes to 0
+    if err != nil {
+        return fmt.Errorf("error initializing like count for video: %w", err)
+    }
+    fmt.Println("Video like count initialized to 0")
+    return nil
+}*/

@@ -99,6 +99,7 @@ func uploadVideo(c echo.Context) error {
 
 		proccessVideo(title, username, filePath, visibility, fileSize)
 		createHLSStream(filePath, title)
+		//initializeVideo(videoID)	
 
 		return c.JSON(http.StatusOK, echo.Map{
 			"message": "File uploaded successfully",

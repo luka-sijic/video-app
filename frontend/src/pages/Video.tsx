@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import { MessageSquare, Share2, Heart } from 'lucide-react';
 import { HelmetProvider } from 'react-helmet-async';
 import { jwtDecode } from "jwt-decode";

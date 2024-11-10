@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ActiveUsersWidget from '../widgets/activeusers';
 import axios from 'axios';
 
 
@@ -8,7 +9,7 @@ type UserType = {
     password: string;
     credits: number;
     role: number;
-    status: string;
+    status: number;
     country: string;
     rating: number;
     avatar: string;
@@ -45,6 +46,9 @@ const Users: React.FC = () => {
     if (error) return <p>Error: {error}</p>;
 
     return (
+      <div className="flex justify-center p-6">
+      <div className="flex space-x-6 max-w-5xl w-full">
+      <ActiveUsersWidget />
         <div className="p-6 bg-black rounded-lg">
           <table className="w-full border-collapse">
             <caption className="mt-4 mb-2 text-sm text-gray-400 text-left">
@@ -72,14 +76,32 @@ const Users: React.FC = () => {
                   <td className="py-3 px-4 text-gray-300">{user.role}</td>
                   <td className="py-3 px-4 text-gray-300">{user.rating}</td>
                   <td className="py-3 px-4 text-gray-300">{user.country}</td>
-                  <td className="py-3 px-4 text-gray-300">{user.status}</td>
+                  <td className="py-3 px-4 text-gray-300">
+                    <StatusBadge status={user.status} />
+                  </td>
                   <td className="py-3 px-4 text-gray-300">{user.creationdate}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      );
+      </div>
+    </div>
+    );
 };
+
+const StatusBadge = ({ status }: { status: number }) => {
+  const baseClasses = "px-2 py-1 rounded-full text-xs font-medium"
+  switch (status) {
+    case 1:
+      return <span className={`${baseClasses} bg-green-500/10 text-green-500`}>Active</span>
+    case 0:
+      return <span className={`${baseClasses} bg-red-500/10 text-red-500`}>Inactive</span>
+    case -1:
+      return <span className={`${baseClasses} bg-yellow-500/10 text-yellow-500`}>Pending</span>
+    default:
+      return <span className={`${baseClasses} bg-gray-500/10 text-gray-400`}>{status}</span>
+  }
+}
 
 export default Users;

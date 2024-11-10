@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
 
 interface DecodedToken {
 	username: string;
@@ -9,19 +11,25 @@ interface DecodedToken {
 
 
 const Navbar: React.FC = () => {
+	const navigate = useNavigate();
 	const [username, setUsername] = useState<string | null>(null);
 
   	useEffect(() => {
     	const token = localStorage.getItem('token');
     	try {
-		if (token) {
-      		const decodedToken = jwtDecode<DecodedToken>(token);
-      		setUsername(decodedToken.username);
-		}
+			if (token) {
+      			const decodedToken = jwtDecode<DecodedToken>(token);
+      			setUsername(decodedToken.username);
+			}
     	} catch (error) {
       		console.error("Invalid token", error);
     	}
   	}, []);
+
+	const handleSignOut = () => {
+		localStorage.removeItem('token');
+		navigate("/login");
+	};
   	
 	return (
     	<nav className="bg-black text-white p-4">

@@ -29,12 +29,14 @@ export default function Home() {
   	const [metadata, setMetadata] = useState<Metadata[]>([]);
   	const [searchQuery, setSearchQuery] = useState('');
   	const [filteredVideos, setFilteredVideos] = useState<Metadata[]>([]);
+    const [loading, setLoading] = useState(true);
 
   	const thumbnailBaseURL = import.meta.env.VITE_STATIC_URL + "/thumbnails/";
   	const navigate = useNavigate();
 
   	useEffect(() => {
 		const fetchVideo = async () => {
+      setLoading(true);
     		try {
         	const response = await fetchVideoMetaData();
         	setMetadata(response);
@@ -47,7 +49,9 @@ export default function Home() {
       	} catch(error) {
         	console.error("error");
 				  return [];
-      	}
+      	} finally {
+          setLoading(false);
+        }
     	}
     	fetchVideo()
   	}, [])
@@ -81,6 +85,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {loading ? (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="loader">Loading...</div> {/* Replace with your spinner component */}
+      </div>
+    ) : (
+      <>
       <header className="border-b border-white/10 p-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <h1 className="text-2xl font-bold">Video Gallery</h1>
@@ -162,6 +172,8 @@ export default function Home() {
           </div>
         )}
       </main>
+      </>
+    )}
     </div>
   )
 }

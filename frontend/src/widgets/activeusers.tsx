@@ -13,14 +13,6 @@ const getRandomColor = () => {
   return colors[Math.floor(Math.random() * colors.length)]
 }
 
-// Mock data for active users
-const mockUsers = [
-  { id: 1, name: "Alice Johnson", avatar: "/placeholder.svg?height=32&width=32" },
-  { id: 2, name: "Bob Smith", avatar: "/placeholder.svg?height=32&width=32" },
-  { id: 3, name: "Charlie Brown", avatar: "/placeholder.svg?height=32&width=32" },
-  { id: 4, name: "Diana Prince", avatar: "/placeholder.svg?height=32&width=32" },
-]
-
 type UserData = {
     id: number;
     username: string;

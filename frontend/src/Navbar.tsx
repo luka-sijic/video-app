@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react"
 
 interface DecodedToken {
 	username: string;
@@ -45,6 +46,14 @@ const Navbar: React.FC = () => {
             			<span>Loading...</span>
           			)}
           			<Link to="/settings" className="hover:text-gray-300">Settings</Link>
+					<Button
+      					variant="outline"
+      					className="bg-black text-white hover:bg-red-600 hover:text-white border-red-600 transition-colors duration-300 px-2 py-1 text-sm"
+						onClick={handleSignOut}
+    				>
+      				<LogOut className="mr-1 h-3 w-3" />
+      					Sign Out
+    				</Button>
         		</div>
       		</div>
     	</nav>

@@ -97,11 +97,14 @@ func Start() {
 	e.Static("/icons", "./uploads/icons")
 	e.Static("/streams", "./streams")
 
+	// Profile Endpoints
 	e.GET("/profile/:id", getProfile)
 	e.GET("/storage/:id", getStorage)
 	e.GET("/activity/:id", getActivity)
+	// Settings Endpoints
 	e.POST("/country", changeCountry, JWTMiddleware)
 	e.POST("/uploadpfp", uploadPfp, JWTMiddleware)
+	e.POST("/changeusername", changeUsername, JWTMiddleware)
 	e.GET("/", root)
 	
 	e.Logger.Fatal(e.Start(":8086"))

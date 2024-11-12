@@ -3,7 +3,7 @@ package database
 import (
 	"fmt"
 	"context"
-	"github.com/joho/godotenv"
+//	"github.com/joho/godotenv"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/redis/go-redis/v9"
 	"log"
@@ -13,12 +13,12 @@ import (
 var DB *pgxpool.Pool
 var RDB *redis.Client
 
-func init() {
-    err := godotenv.Load(".env")
-    if err != nil {
-        log.Fatalf("Error loading .env file: %v", err)
-    }
-}
+//func init() {
+//    err := godotenv.Load(".env")
+//    if err != nil {
+//        log.Fatalf("Error loading .env file: %v", err)
+//    }
+//}
 
 func Connect() {
 	ConnectPostgres()

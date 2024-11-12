@@ -1,5 +1,11 @@
 pipeline {
     agent any
+    environment {
+        DATABASE_URL = credentials('database_url_credential_id')
+        REDIS_ADDR = credentials('redis_addr_credential_id')
+        REDIS_PASS = credentials('redis_pw_credential_id')
+    	JWT_TOKEN = credentials('jwt_token_credential')
+    }
     stages {
         stage('Build Backend') {
             steps {

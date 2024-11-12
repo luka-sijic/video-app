@@ -10,7 +10,7 @@ pipeline {
         stage('Deploy Backend') {
             steps {
                 // Transfer executable and restart service
-                sh 'systemctl restart video.service'
+                sh 'sudo systemctl restart video.service'
             }
         }
         stage('Build Frontend') {

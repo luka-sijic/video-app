@@ -3,10 +3,10 @@ package server
 import (
 	"net/http"
 	"strings"
-	"log"
+//	"log"
 	"os"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/joho/godotenv"
+//	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
     "github.com/labstack/echo/v4/middleware"
 )
@@ -14,10 +14,10 @@ import (
 var jwtToken string
 
 func init() {
-	err := godotenv.Load(".env")
-    if err != nil {
-        log.Fatalf("Error loading .env file: %v", err)
-    }
+//	err := godotenv.Load(".env")
+//    if err != nil {
+//        log.Fatalf("Error loading .env file: %v", err)
+//    }
 	jwtToken = os.Getenv("JWT_TOKEN")
 }
 

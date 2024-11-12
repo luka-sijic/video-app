@@ -10,7 +10,7 @@ pipeline {
         stage('Deploy Backend') {
             steps {
                 // Transfer executable and restart service
-                sh 'sudo systemctl restart video.service'
+                sh 'systemctl restart video.service'
             }
         }
         stage('Build Frontend') {
@@ -23,7 +23,7 @@ pipeline {
             steps {
                 // Transfer built frontend files
                 sh 'ls ${WORKSPACE}'
-                sh 'sudo rm -rf /var/www/v1.basedgroup.com/* && sudo mv ${WORKSPACE}/frontend/dist/* /var/www/v1.basedgroup.com'
+                sh 'rm -rf /var/www/v1.basedgroup.com/* && mv ${WORKSPACE}/frontend/dist/* /var/www/v1.basedgroup.com'
             }
         }
     }

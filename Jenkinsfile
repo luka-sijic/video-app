@@ -1,8 +1,5 @@
 pipeline {
     agent any
-    environment {
-        PATH = "${PATH}:/usr/local/go/bin"  // Update the path as needed
-    }
     stages {
         stage('Build Backend') {
             steps {

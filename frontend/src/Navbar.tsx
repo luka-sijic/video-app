@@ -41,7 +41,7 @@ const Navbar: React.FC = () => {
           			<Link to="/upload" className="hover:text-gray-300">Upload</Link>
           			<Link to="/users" className="hover:text-gray-300">Users</Link>
           			{username ? (
-          			<Link to={`/profile/${username}`} className="hover:text-gray-300">Profilez</Link>
+          			<Link to={`/profile/${username}`} className="hover:text-gray-300">Profile</Link>
           				) : (
             			<span>Loading...</span>
           			)}

@@ -9,3 +9,11 @@ CREATE TABLE videos (
     duration VARCHAR(255),
     views INT DEFAULT 0
 );
+CREATE TABLE comments (                                                                       
+    id SERIAL PRIMARY KEY NOT NULL,
+    content text NOT NULL,
+    username character varying(255) NOT NULL,
+    video_id integer NOT NULL,
+    likes integer DEFAULT 0,
+    commented_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);

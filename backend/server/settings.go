@@ -6,9 +6,12 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
+	//"os"
 	"time"
-	"path/filepath"
+	"strings"
+	//"path/filepath"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 func changeCountry(c echo.Context) error {
@@ -22,6 +25,14 @@ func changeCountry(c echo.Context) error {
 		fmt.Println("Error changing country")
 	}
 	return c.JSON(http.StatusOK, "File uploaded")
+}
+
+// GetAvatarURL generates the public URL for an avatar
+func GetAvatarURL(filename string) string {
+	if filename == "" {
+		return "" // Return empty string or default avatar URL
+	}
+	return fmt.Sprintf("%s/avatars/%s", "<url>", filename)
 }
 
 // Modified upload function using the global R2 client

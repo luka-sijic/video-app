@@ -120,7 +120,8 @@ func getStorage(c echo.Context) error {
 	if err = rows.Err(); err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error processing video size data"})
 	}
-	// Magic
+	// Magic to calculate storage
+	// NEED TO UPDATE VARIABLE NAMES
 	var val int64 
 	for i,_ := range vSizes {
 		//fmt.Println(vSizes[i])

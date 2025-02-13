@@ -3,21 +3,21 @@ package server
 import (
 	"net/http"
 	"strings"
-//	"log"
+	"log"
 	"os"
 	"github.com/golang-jwt/jwt/v5"
-//	"github.com/joho/godotenv"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
-    "github.com/labstack/echo/v4/middleware"
+    	"github.com/labstack/echo/v4/middleware"
 )
 
 var jwtToken string
 
 func init() {
-//	err := godotenv.Load(".env")
-//    if err != nil {
-//        log.Fatalf("Error loading .env file: %v", err)
-//    }
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
 	jwtToken = os.Getenv("JWT_TOKEN")
 }
 
@@ -61,14 +61,13 @@ func JWTMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 func Start() {
 	e := echo.New()
 
+	// Update CORS upon deployment
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"}, 
 		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization}, 
     	AllowCredentials: false,
 	}))
-
-	
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -81,7 +80,6 @@ func Start() {
 	// Comment Endpoints
 	e.GET("/video/:id/comment", getComments)
 	e.POST("/video/:id/comment", sendComment, JWTMiddleware)
-	e.GET("/ws/comments", handleWebSocket)
 	// Like Endpoints
 	e.POST("/video/:id/like", likeVideo)
 	e.POST("/video/:id/unlike", unlikeVideo)
